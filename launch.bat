@@ -1,0 +1,16 @@
+@echo off
+chcp 65001 >nul
+echo QuestPet + QuestBoard launching...
+echo.
+echo [1/3] Starting Vite server...
+start "ViteServer" /D "questboard" cmd /c "npx vite --host"
+
+echo [2/3] Waiting... 
+ping -n 6 127.0.0.1 >nul
+
+echo [3/3] Starting Electron panel...
+start "QuestBoard" /D "questboard" cmd /c "npx electron ."
+
+echo Starting Python pet...
+python main.py
+pause

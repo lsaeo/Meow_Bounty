@@ -1,0 +1,27 @@
+# PyInstaller
+dist/
+build/
+QuestPet.spec
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# User data (dev only)
+data/
+
+# Electron
+questboard/node_modules/
+questboard/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
