@@ -9,7 +9,7 @@ function ensureDataDir() {
   const defaults = {
     'hero.json': '{"name": "勇者", "level": 1, "exp": 0, "hp": 100, "maxHp": 100, "gold": 0, "streak": 0, "last_login": ""}',
     'tasks.json': '[]',
-    'ai_settings.json': '{"enabled": false, "api_key": "", "api_base": "https://api.deepseek.com", "model": "deepseek-v4-flash", "system_prompt": ""}',
+    'ai_settings.json': '{"enabled": false, "api_key": "", "api_base": "https://api.deepseek.com", "model": "deepseek-chat", "system_prompt": ""}',
   }
   for (const [name, content] of Object.entries(defaults)) {
     const p = path.join(DATA_DIR, name)
@@ -48,13 +48,11 @@ function createWindow() {
     }
   })
 
-  const isDev = process.argv.includes('--dev')
+  const isDev = process.argv.includes('--dev') || !app.isPackaged
   if (isDev) {
     win.loadURL('http://localhost:5173')
-  } else if (fs.existsSync(path.join(__dirname, '..', 'dist', 'index.html'))) {
-    win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'))
   } else {
-    win.loadURL('http://localhost:5173')
+    win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'))
   }
 
   win.setMenuBarVisibility(false)

@@ -30,14 +30,14 @@ function setTomorrow() { scheduleDate.value = tomorrowDate() }
 function openAiSettings() {
   aiKey.value = store.aiSettings.api_key || ''
   aiBase.value = store.aiSettings.api_base || 'https://api.deepseek.com'
-  aiModel.value = store.aiSettings.model || 'deepseek-v4-flash'
-  aiPrompt.value = store.aiSettings.system_prompt || '你是冒险者公会的长老，负责将村民们的日常委托转化为中世纪奇幻风格的悬赏任务。\n规则：1) 保留原任务的核心含义，但用奇幻世界观重写；2) 控制在15字以内；3) 使用类似"讨伐""寻找""锻造""破译""护送"等动作词；4) 加入怪物、魔法、异世界元素；5) 只输出任务名，不要解释。\n\n世界观：剑与魔法世界，有龙族、哥布林、精灵、矮人、不死族等种族。'
+  aiModel.value = store.aiSettings.model || 'deepseek-chat'
+  aiPrompt.value = store.aiSettings.system_prompt || ''
   showAiSettings.value = true
 }
 function saveAiSettings() {
   store.aiSettings.api_key = aiKey.value.trim()
   store.aiSettings.api_base = aiBase.value.trim() || 'https://api.deepseek.com'
-  store.aiSettings.model = aiModel.value.trim() || 'deepseek-v4-flash'
+  store.aiSettings.model = aiModel.value.trim() || 'deepseek-chat'
   store.aiSettings.system_prompt = aiPrompt.value.trim()
   store.persistAi()
   showAiSettings.value = false
@@ -47,11 +47,7 @@ async function submit() {
   if (!title.value.trim()) return
   const original = title.value.trim()
   let finalTitle = original, originalName = null
-  if (store.aiEnabled) { 
-    const converted = await store.convertTask(original)
-    finalTitle = (converted && converted.trim()) || original
-    originalName = finalTitle !== original ? original : null 
-  }
+  if (store.aiEnabled) { finalTitle = await store.convertTask(original) || original; originalName = finalTitle !== original ? original : null }
   const d = difficulties.find(x => x.name === difficulty.value)
   store.addTask({ title: finalTitle, original_name: originalName, difficulty: difficulty.value, reward: d.reward, client: client.value, date: scheduleDate.value })
   title.value = ''

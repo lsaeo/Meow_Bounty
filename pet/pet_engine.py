@@ -169,10 +169,8 @@ class QuestPet:
         self._dialogue = self._load_dialogue()
 
     def _load_dialogue(self):
-        if getattr(sys, 'frozen', False):
-            path = os.path.join(sys._MEIPASS, 'dialogue.json')
-        else:
-            path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'dialogue.json')
+        base = os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        path = os.path.join(base, 'dialogue.json')
         try:
             with open(path, 'r', encoding='utf-8') as f:
                 return json.load(f)

@@ -30,9 +30,9 @@ def launch_questboard():
             _questboard_proc.terminate()
             try: _questboard_proc.wait(timeout=3)
             except: pass
-        electron_exe = os.path.join(QUESTBOARD_DIR, 'node_modules', 'electron', 'dist', 'electron.exe')
+        electron_cmd = os.path.join(QUESTBOARD_DIR, 'node_modules', '.bin', 'electron.cmd')
         _questboard_proc = subprocess.Popen(
-            [electron_exe, '.'], cwd=QUESTBOARD_DIR,
+            [electron_cmd, '.'], cwd=QUESTBOARD_DIR,
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
         )
     except Exception as e:

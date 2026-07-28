@@ -12,7 +12,7 @@ const page = ref('today')
 
 onMounted(async () => {
   await store.load()
-  gsap.from('.card-wrap', { opacity:0, y:20, scale:.95, stagger:.06, duration:.4, ease:'power2.out' })
+  gsap.from('.card-wrap', { opacity:0, y:30, scale:.9, stagger:.08, duration:.5, ease:'power2.out' })
 })
 
 const today = () => store.questToday()
@@ -89,11 +89,10 @@ function dayLabel(s) {
       <div class="cards-area" v-if="store.loaded">
         <!-- 今日/明日: 平铺 -->
         <template v-if="page!=='future'">
-          <template v-for="(t,i) in visibleTasks" :key="t.id">
-            <div class="card-wrap" v-if="t.name">
-              <QuestCard :task="t" @complete="onComplete(t.id)" @delete="onDelete(t.id)" />
-            </div>
-          </template>
+          <div v-for="(t,i) in visibleTasks" :key="t.id" class="card-wrap"
+               :style="{transform:`rotate(${-1.5 + i*.8}deg)`,zIndex:visibleTasks.length-i}">
+            <QuestCard :task="t" @complete="onComplete(t.id)" @delete="onDelete(t.id)" />
+          </div>
           <div v-if="visibleTasks.length===0" class="empty-state">
             <div class="empty-glow"></div>
             <div class="empty-scroll">
@@ -108,7 +107,8 @@ function dayLabel(s) {
           <div v-for="g in futureGroups" :key="g.date" class="future-block">
             <div class="future-date">{{ dayLabel(g.date?.slice(5)) }}</div>
             <div class="future-cards">
-              <div v-for="(t,i) in g.tasks" :key="t.id" class="card-wrap">
+              <div v-for="(t,i) in g.tasks" :key="t.id" class="card-wrap"
+                   :style="{transform:`rotate(${-1.5 + i*.8}deg)`,zIndex:g.tasks.length-i}">
                 <QuestCard :task="t" @complete="onComplete(t.id)" @delete="onDelete(t.id)" />
               </div>
             </div>
@@ -182,8 +182,6 @@ function dayLabel(s) {
 
 .cards-area { display:flex; flex-wrap:wrap; gap:16px; align-content:flex-start; padding:4px 0; }
 .card-wrap { transition:all .2s; }
-.card-wrap:nth-child(odd) { transform:rotate(.3deg); }
-.card-wrap:nth-child(even) { transform:rotate(-.3deg); }
 .card-wrap:hover { transform:scale(1.04) translateY(-4px)!important; z-index:999!important; }
 
 .empty-state { width:100%; display:flex; justify-content:center; align-items:center; padding:80px 0; position:relative; }

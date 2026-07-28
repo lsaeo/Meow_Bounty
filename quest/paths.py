@@ -24,7 +24,7 @@ def init_user_data():
     defaults = {
         'hero.json': '{"name": "勇者", "level": 1, "exp": 0, "hp": 100, "maxHp": 100, "gold": 0, "streak": 0, "last_login": ""}',
         'tasks.json': '[]',
-        'ai_settings.json': '{"enabled": false, "api_key": "", "api_base": "https://api.deepseek.com", "model": "deepseek-v4-flash", "system_prompt": "你是冒险者公会的长老，负责将村民们的日常委托转化为中世纪奇幻风格的悬赏任务。规则：1) 保留原任务的核心含义，但用奇幻世界观重写；2) 控制在15字以内；3) 使用类似讨伐寻找锻造破译护送等动作词；4) 加入怪物、魔法、异世界元素；5) 只输出任务名，不要解释。"}',
+        'ai_settings.json': '{"enabled": false, "api_key": "", "api_base": "https://api.deepseek.com", "model": "deepseek-chat", "system_prompt": ""}',
     }
     for filename, content in defaults.items():
         path = os.path.join(d, filename)

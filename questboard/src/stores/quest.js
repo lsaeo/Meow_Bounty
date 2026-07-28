@@ -5,23 +5,18 @@ import { useAudioStore } from './audio.js'
 const isElectron = typeof window !== 'undefined' && window.api
 
 async function loadJson(filename, fallback) {
-  const local = localStorage.getItem(filename)
-  if (local) { try { return JSON.parse(local) } catch {} }
   if (isElectron) return await window.api.readJson(filename) || fallback
-  return fallback
+  return JSON.parse(localStorage.getItem(filename) || 'null') || fallback
 }
 async function saveJson(filename, data) {
-  localStorage.setItem(filename, JSON.stringify(data))
-  if (isElectron) { try { await window.api.writeJson(filename, data) } catch {} }
-}
-async function saveSyncJson(filename, data) {
+  if (isElectron) { await window.api.writeJson(filename, data); return }
   localStorage.setItem(filename, JSON.stringify(data))
 }
 
 export const useQuestStore = defineStore('quest', () => {
   const tasks = ref([])
   const hero = ref({ name: '勇者', level: 1, exp: 0, hp: 100, maxHp: 100, gold: 0, streak: 0, last_login: '' })
-  const aiSettings = ref({ enabled: false, api_key: '', api_base: 'https://api.deepseek.com', model: 'deepseek-v4-flash', system_prompt: '' })
+  const aiSettings = ref({ enabled: false, api_key: '', api_base: 'https://api.deepseek.com', model: 'deepseek-chat', system_prompt: '' })
   const showVictory = ref(false)
   const lastCompleted = ref(null)
   const loaded = ref(false)
@@ -42,7 +37,6 @@ export const useQuestStore = defineStore('quest', () => {
 
   async function load() {
     tasks.value = await loadJson('tasks.json', [])
-    tasks.value = tasks.value.filter(t => t.name && t.name.trim())
     hero.value = await loadJson('hero.json', { name: '勇者', level: 1, exp: 0, hp: 100, maxHp: 100, gold: 0, streak: 0, last_login: '' })
     await loadAi()
     loaded.value = true
@@ -51,10 +45,16 @@ export const useQuestStore = defineStore('quest', () => {
   }
 
   function saveSync() {
-    const data = JSON.parse(JSON.stringify(tasks.value))
-    const heroData = JSON.parse(JSON.stringify(hero.value))
-    localStorage.setItem('tasks.json', JSON.stringify(data))
-    localStorage.setItem('hero.json', JSON.stringify(heroData))
+    const data = {
+      tasks: JSON.parse(JSON.stringify(tasks.value)),
+      hero: JSON.parse(JSON.stringify(hero.value))
+    }
+    if (isElectron) {
+      window.api.writeJson('tasks.json', data.tasks)
+      window.api.writeJson('hero.json', data.hero)
+    }
+    localStorage.setItem('tasks.json', JSON.stringify(data.tasks))
+    localStorage.setItem('hero.json', JSON.stringify(data.hero))
   }
 
   async function loadAi() {
@@ -64,12 +64,8 @@ export const useQuestStore = defineStore('quest', () => {
   async function persistAi() { await saveJson('ai_settings.json', aiSettings.value) }
 
   async function save() {
-    localStorage.setItem('tasks.json', JSON.stringify(tasks.value))
-    localStorage.setItem('hero.json', JSON.stringify(hero.value))
-    if (isElectron) {
-      try { await window.api.writeJson('tasks.json', tasks.value) } catch {}
-      try { await window.api.writeJson('hero.json', hero.value) } catch {}
-    }
+    await saveJson('tasks.json', tasks.value)
+    await saveJson('hero.json', hero.value)
   }
 
   async function convertTask(text) {
@@ -87,7 +83,7 @@ export const useQuestStore = defineStore('quest', () => {
             { role: 'system', content: aiSettings.value.system_prompt || '把待办转成奇幻冒险任务，15字以内，只输出任务名' },
             { role: 'user', content: `请把这个待办转为悬赏任务名：${text}` },
           ],
-          max_tokens: 200, temperature: 0.8,
+          max_tokens: 50, temperature: 0.8,
         }),
       })
       const data = await resp.json()
