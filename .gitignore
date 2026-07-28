@@ -21,6 +21,14 @@ questboard/dist/
 *.swp
 *.swo
 
+# Electron (old)
+electron-ui/
+
+# Build
+setup.iss
+run.bat
+setup_run.bat
+
 # OS
 .DS_Store
 Thumbs.db
